@@ -195,9 +195,10 @@ function calculateVeracityOfNews(newsURL, database, processId) {
 
     processes[index].news.push(newsURL)
 
-    const voters = database.filter(value => { return value.newsURL == newsURL })
+    const voters = database.filter(value => { 
+        return value.newsURL == newsURL
+    })
     const votersEligible =  voters.filter(value => { return !isInArray(value.userPublicKey, processes[index].users) })
-
     //get unique users: users can vote multiple times
     var uniqueUsers = votersEligible.reduce((acc, inc) => {
         if(!acc.find( i => i.userPublicKey == inc.userPublicKey)) {
@@ -205,7 +206,6 @@ function calculateVeracityOfNews(newsURL, database, processId) {
         }
         return acc;
     },[])
-
     const votersReputation = uniqueUsers.map(value => { return calculateReputationOfUser(value.userPublicKey, database, processId)})
     //calculate veracity based on users reputatation
     var userVotes = uniqueUsers.map ( user => {
@@ -213,8 +213,8 @@ function calculateVeracityOfNews(newsURL, database, processId) {
         var votesByUserOnThisNews = database.filter(value => value.userPublicKey == user.userPublicKey)
         var sorted = votesByUserOnThisNews.sort(function(a, b) {
             // convert date object into number to resolve issue in typescript
-            var slicedData1 = a.date.slice(0, -4)
-            var slicedData2 = b.date.slice(0, -4)
+            var slicedData1 = a.date.toString().slice(0, -4)
+            var slicedData2 = b.date.toString().slice(0, -4)
             var date1 = new Date(slicedData1)
             var date2 = new Date(slicedData2)
             return date1 - date2
@@ -244,13 +244,11 @@ function getTrendingNews() {
 
 function startNewsValidation(newsURL) {
     const processId = new Date().getUTCMilliseconds();
-
     processes.push(new Process(processId))
 
     return new Promise(function(finishPromisse, reject) {
         blockchain.getAllVotes().then(function(result) {
             //result will be an array of Block
-
             finishPromisse(calculateVeracityOfNews(newsURL, result, processId))
 
         }, function(error) {reject(error)})

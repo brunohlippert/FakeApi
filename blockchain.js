@@ -131,7 +131,7 @@ function blockchainGetAllVotes() {
     return new Promise(function(finishPromise, reject) {
         got(allVotesPath)
         .then(function(response) {
-            const result = JSON.parse(response.body).map(value => {return new Block(value.vote, value.newsURL, value.userPublicKey, value.date)})
+            const result = JSON.parse(response.body).map(value => {return new Block(value.vote, value.newsUrl, value.userPublicKey, value.date)})
             finishPromise(result)
         })
         .catch(function(error) {
